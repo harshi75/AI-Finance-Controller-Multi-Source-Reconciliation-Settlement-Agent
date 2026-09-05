@@ -1,8 +1,7 @@
 # AI Finance Controller
 
 All-in-one reconciliation, forecasting, tax-matching, and Q&A system for
-finance ops. Built for a hackathon with a hard Sept 5 deadline — scoped to
-be genuinely demo-able, not feature-complete.
+finance ops. 
 
 ## What's here (working)
 
@@ -27,9 +26,7 @@ be genuinely demo-able, not feature-complete.
 - **Streamlit dashboard** (`dashboard.py`) — split-screen: match rate +
   exception ledger on the left, Q&A chat on the right.
 
-## Not yet built
 
-Nothing — all six architecture components are implemented:
 
 - **LangGraph orchestration** — `app/langgraph_agent.py` uses LangGraph's
   `create_react_agent` as the coordinator, matching the original
@@ -45,16 +42,11 @@ Nothing — all six architecture components are implemented:
   `/tax/classify` tries Chroma first and falls back on any exception; the
   response includes `"engine_used"` so you can see which one actually ran.
 
-If you want to force ChromaDB and see whether it works cleanly on your
-machine's network before demo day, just check the `engine_used` field in
-the `/tax/classify` response — `"chromadb"` means it worked, `"tfidf_fallback"`
-means it silently degraded. Either way the demo doesn't break.
-
 ## Setup
 
 ```bash
 pip install -r requirements.txt
-export ANTHROPIC_API_KEY=your_key_here   # only needed for the Q&A agent
+export GEMINI_API_KEY=your_key_here   # only needed for the Q&A agent
 ```
 
 ## Run
@@ -97,20 +89,3 @@ print(f'{len(reconciled)} reconciled, {len(exceptions)} exceptions, '
 | `GET /forecast?days=7` | cash projection off reconciled data |
 | `GET /query/batch/{batch_id}` | everything tied to a batch — the Q&A agent's main tool |
 
-## Build order if you're finishing this against the clock
-
-1. ✅ Ingestion + validation — done
-2. ✅ Deterministic + fuzzy reconciliation + exception gate — done
-3. ✅ Dashboard shell — done
-4. ✅ Forecaster — done
-5. ✅ Q&A agent — done (plain tool-calling, not LangGraph)
-6. ⬜ Tax-Line Matcher RAG — only if time allows
-7. ⬜ Polish: dashboard styling, README screenshots, demo script/video
-
-## The one rule not to break
-
-The LLM never touches reconciliation math or forecast numbers directly.
-Those are computed programmatically (Pandas/NumPy/rapidfuzz). The LLM's
-job is orchestration, classification reasoning, and natural-language Q&A
-over data the tools already computed. This is the thing judges will
-specifically probe for.
